@@ -1,4 +1,6 @@
-# Pastebin jCxZg9kz
+// Pastebin jCxZg9kz
+// Script by Brian Stack
+
 let taskcluster = require('taskcluster-client');
 let request = require('request');
 let fs = require('fs');
@@ -15,12 +17,13 @@ async function main() {
     continuationToken = group.continuationToken;
     group.tasks.forEach(async task => {
       let url = await queue.buildUrl(queue.getLatestArtifact, task.status.taskId, 'public/logs/live.log')
-      let log = request(url)
+      console.log(url);
+      let log = request({url: url, gzip: true})
         .on('error', function(err) {
           console.log('unable to fetch logs for ' + task.status.taskId);
           console.log(err)
         })
-        .pipe(fs.createWriteStream(task.status.taskId))
+        .pipe(fs.createWriteStream("results/" + task.status.taskId))
     });
   } while (continuationToken)
 }
